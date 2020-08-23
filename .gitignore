@@ -1,0 +1,20 @@
+node_modules
+yarn-error.log
+
+# Builds and artifacts
+build
+*.tgz
+yalc.lock
+.yalc
+dist
+.ts-node
+
+# Testing and coverage
+gsc-testruns
+.nyc_output
+coverage
+.debug-log
+
+# Misc
+scratch.*
+scratch
