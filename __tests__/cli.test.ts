@@ -61,7 +61,7 @@ test(`Does run locally, by bypassing with flag`, async (t) => {
 	await t.notThrowsAsync(
 		new Promise((res, rej) => {
 			spawnedProc = spawn(
-				normalize(`${CLI_CMD_BASE}`),
+				`${CLI_CMD_BASE}`,
 				[`--skipDetection`, `--servePort`, `${TEST_PORT}`],
 				{
 					shell: true,
@@ -102,7 +102,7 @@ test(`Does run on Glitch, by detecting environment`, async (t) => {
 	t.timeout(1000 * 20, `Extra time for server to start`);
 	await t.notThrowsAsync(
 		new Promise((res, rej) => {
-			spawnedProc = spawn(normalize(`${CLI_CMD_BASE}`), [`--servePort`, `${TEST_PORT}`], {
+			spawnedProc = spawn(`${CLI_CMD_BASE}`, [`--servePort`, `${TEST_PORT}`], {
 				shell: true,
 				windowsHide: true,
 				detached: false,
