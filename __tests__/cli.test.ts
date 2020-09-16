@@ -13,7 +13,7 @@ const ENV_WITH_LOCAL_BIN: NodeJS.ProcessEnv = {
 	path: `${process.env.path};${LOCAL_BIN_PATH}`,
 };
 const CLI_CALL_PATH = normalize(`${__dirname}/../src/cli.ts`);
-const CLI_CMD_BASE = `ts-node --transpile-only ${CLI_CALL_PATH} --bailOnNonGlitch`;
+const CLI_CMD_BASE = `ts-node --transpile-only ${CLI_CALL_PATH}`;
 
 let RUNNING_PROCS: Array<ChildProcess | undefined> = [];
 const delistRunningProc = (pidToDelist: number) => {
@@ -36,7 +36,7 @@ test('Does NOT run if not on Glitch, with bail on', async (t) => {
 	// Without using skip detection flag / override, and early bail = on, this should fail
 	await t.throwsAsync(
 		async () => {
-			execSync(`${CLI_CMD_BASE}`, {
+			execSync(`${CLI_CMD_BASE} --bailOnNonGlitch`, {
 				cwd: projectDirPath,
 				env: ENV_WITH_LOCAL_BIN,
 			});
@@ -58,32 +58,30 @@ test(`Does run locally, by bypassing with flag`, async (t) => {
 
 	let spawnedProc: ChildProcess;
 	t.timeout(1000 * 20, `Extra time for server to start`);
-	await t.notThrowsAsync(
-		new Promise((res, rej) => {
-			spawnedProc = spawn(
-				normalize(`${CLI_CMD_BASE}`),
-				[`--skipDetection`, `--servePort`, `${TEST_PORT}`],
-				{
-					shell: true,
-					windowsHide: true,
-					detached: false,
-					cwd: projectDirPath,
-					env: ENV_WITH_LOCAL_BIN,
-				}
-			);
-			RUNNING_PROCS.push(spawnedProc);
+	await t.notThrowsAsync(async () => {
+		spawnedProc = spawn(
+			`${CLI_CMD_BASE}`,
+			[`--bailOnNonGlitch`, `--skipDetection`, `--servePort`, `${TEST_PORT}`],
+			{
+				shell: true,
+				windowsHide: true,
+				detached: false,
+				cwd: projectDirPath,
+				env: ENV_WITH_LOCAL_BIN,
+			}
+		);
+		RUNNING_PROCS.push(spawnedProc);
 
-			spawnedProc.stderr.on('data', (err) => {
-				rej(err.toString());
-			});
-			spawnedProc.stdout.on('data', (data) => {
-				const strOut: string = data.toString();
-				if (/serving from/gim.test(strOut)) {
-					res(`Server is up!`);
-				}
-			});
-		})
-	);
+		spawnedProc.stderr.on('data', (err) => {
+			throw new Error(err.toString());
+		});
+		spawnedProc.stdout.on('data', (data: Buffer | string | any) => {
+			const strOut: string = data.toString();
+			if (/serving from/gim.test(strOut)) {
+				return `Server is up!`;
+			}
+		});
+	});
 
 	await testTreeKill(spawnedProc.pid);
 	delistRunningProc(spawnedProc.pid);
@@ -100,9 +98,11 @@ test(`Does run on Glitch, by detecting environment`, async (t) => {
 
 	let spawnedProc: ChildProcess;
 	t.timeout(1000 * 20, `Extra time for server to start`);
-	await t.notThrowsAsync(
-		new Promise((res, rej) => {
-			spawnedProc = spawn(normalize(`${CLI_CMD_BASE}`), [`--servePort`, `${TEST_PORT}`], {
+	await t.notThrowsAsync(async () => {
+		spawnedProc = spawn(
+			`${CLI_CMD_BASE}`,
+			[`--bailOnNonGlitch`, `--servePort`, `${TEST_PORT}`],
+			{
 				shell: true,
 				windowsHide: true,
 				detached: false,
@@ -111,20 +111,20 @@ test(`Does run on Glitch, by detecting environment`, async (t) => {
 					...ENV_WITH_LOCAL_BIN,
 					API_SERVER_EXTERNAL: 'https://api.glitch.com',
 				},
-			});
-			RUNNING_PROCS.push(spawnedProc);
+			}
+		);
+		RUNNING_PROCS.push(spawnedProc);
 
-			spawnedProc.stderr.on('data', (err) => {
-				rej(err.toString());
-			});
-			spawnedProc.stdout.on('data', (data) => {
-				const strOut: string = data.toString();
-				if (/serving from/gim.test(strOut)) {
-					res(`Server is up!`);
-				}
-			});
-		})
-	);
+		spawnedProc.stderr.on('data', (err) => {
+			throw new Error(err.toString());
+		});
+		spawnedProc.stdout.on('data', (data) => {
+			const strOut: string = data.toString();
+			if (/serving from/gim.test(strOut)) {
+				return `Server is up!`;
+			}
+		});
+	});
 
 	await testTreeKill(spawnedProc.pid);
 	delistRunningProc(spawnedProc.pid);
