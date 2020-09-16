@@ -11,12 +11,15 @@ export async function main(config: MainConfig) {
 		const isOnGlitch = await detectIsOnGlitch();
 		/* istanbul ignore next */
 		if (!isOnGlitch) {
-			throw new Error(NotOnGlitchErrorMsg);
+			if (config.bailOnNonGlitch === true) {
+				throw new Error(NotOnGlitchErrorMsg);
+			}
 		}
 	}
 
 	// Pass to static-build-cache module
 	delete config.skipDetection;
+	delete config.bailOnNonGlitch;
 	return await sbcMain(config);
 }
 

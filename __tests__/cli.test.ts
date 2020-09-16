@@ -13,7 +13,7 @@ const ENV_WITH_LOCAL_BIN: NodeJS.ProcessEnv = {
 	path: `${process.env.path};${LOCAL_BIN_PATH}`,
 };
 const CLI_CALL_PATH = normalize(`${__dirname}/../src/cli.ts`);
-const CLI_CMD_BASE = `ts-node --transpile-only ${CLI_CALL_PATH}`;
+const CLI_CMD_BASE = `ts-node --transpile-only ${CLI_CALL_PATH} --bailOnNonGlitch`;
 
 let RUNNING_PROCS: Array<ChildProcess | undefined> = [];
 const delistRunningProc = (pidToDelist: number) => {
@@ -24,7 +24,7 @@ test.before(async () => {
 	testRunDirPath = await createTestDir();
 });
 
-test('Does NOT run if not on Glitch, by default', async (t) => {
+test('Does NOT run if not on Glitch, with bail on', async (t) => {
 	// Scaffold
 	const { projectDirPath } = await createTestProject(
 		testRunDirPath,
@@ -33,7 +33,7 @@ test('Does NOT run if not on Glitch, by default', async (t) => {
 	);
 
 	// Attempt to run program, without mocking Glitch environment
-	// Without using skip detection flag / override, this should fail
+	// Without using skip detection flag / override, and early bail = on, this should fail
 	await t.throwsAsync(
 		async () => {
 			execSync(`${CLI_CMD_BASE}`, {
@@ -62,7 +62,7 @@ test(`Does run locally, by bypassing with flag`, async (t) => {
 		new Promise((res, rej) => {
 			spawnedProc = spawn(
 				normalize(`${CLI_CMD_BASE}`),
-				[`--skipDetection`, `--port`, `${TEST_PORT}`],
+				[`--skipDetection`, `--servePort`, `${TEST_PORT}`],
 				{
 					shell: true,
 					windowsHide: true,
@@ -102,7 +102,7 @@ test(`Does run on Glitch, by detecting environment`, async (t) => {
 	t.timeout(1000 * 20, `Extra time for server to start`);
 	await t.notThrowsAsync(
 		new Promise((res, rej) => {
-			spawnedProc = spawn(normalize(`${CLI_CMD_BASE}`), [`--port`, `${TEST_PORT}`], {
+			spawnedProc = spawn(normalize(`${CLI_CMD_BASE}`), [`--servePort`, `${TEST_PORT}`], {
 				shell: true,
 				windowsHide: true,
 				detached: false,

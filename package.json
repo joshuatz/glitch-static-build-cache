@@ -6,6 +6,9 @@
 	"bin": {
 		"glitch-cache": "dist/cli.js"
 	},
+	"files": [
+		"dist/"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/joshuatz/glitch-static-build-cache.git"
@@ -26,15 +29,17 @@
 	],
 	"license": "MIT",
 	"scripts": {
-		"build": "",
-		"format": "yarn prettier --check src",
-		"test": "ava",
-		"coverage": "nyc --reporter=html --reporter=text-lcov ava"
+		"clean": "shx rm -rf dist && shx mkdir dist",
+		"build": "yarn clean && tsc",
+		"lint": "prettier --check src __tests__",
+		"fix": "prettier --write src __tests__",
+		"test": "yarn lint && nyc --reporter=lcov ava",
+		"test-nocov": "yarn lint && ava"
 	},
 	"dependencies": {
 		"commander": "^6.0.0",
 		"detect-is-on-glitch": "^1.0.1",
-		"static-build-cache": "file:.yalc/static-build-cache"
+		"static-build-cache": "^0.1.0"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.1",
@@ -42,6 +47,8 @@
 		"ava": "^3.12.0",
 		"fs-extra": "^9.0.1",
 		"nyc": "^15.1.0",
+		"prettier": "^2.1.0",
+		"shx": "^0.3.2",
 		"source-map-support": "^0.5.19",
 		"tree-kill": "^1.2.2",
 		"ts-node": "^9.0.0",

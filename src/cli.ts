@@ -20,17 +20,27 @@ const cli = async () => {
 	program
 		.version(packageInfo.version)
 		.name(packageInfo.name)
-		.option(`--skipDetection`, `Skip "is on glitch" detection`);
+		.option(`--skipDetection`, `Skip "is on glitch" detection`)
+		.option(
+			`--bailOnNonGlitch`,
+			`Program will forcefully exit and not allow chained commands to execute, if not on Glitch`
+		);
 	program.parse(process.argv);
 
 	// Glitch detection
 	const isOnGlitch = await detectIsOnGlitch();
+	const bailOnNonGlitch = program.bailOnNonGlitch === true;
 	if (program.skipDetection !== true && !isOnGlitch) {
-		// Bail early, and allow chained commands to execute!
-		if (!program.silent) {
-			console.error(NotOnGlitchErrorMsg);
+		if (bailOnNonGlitch) {
+			// Bail early, and allow chained commands to execute!
+			if (!program.silent) {
+				console.error(NotOnGlitchErrorMsg);
+			}
+			process.exit(1);
+		} else {
+			// Bail, but allow chained commands to execute
+			process.exit(0);
 		}
-		process.exit(1);
 	} else {
 		const inputConfig: MainConfig = {
 			projectRoot: program.projectRoot,
