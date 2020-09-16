@@ -1,4 +1,5 @@
 # Glitch-Static-Build-Cache
+![NodeJS CI Passing Status Badge](https://github.com/joshuatz/glitch-static-build-cache/workflows/Node.js%20CI/badge.svg) [![Code Coverage Badge](https://codecov.io/gh/joshuatz/static-build-cache/branch/main/graph/badge.svg)](https://codecov.io/gh/joshuatz/glitch-static-build-cache/branch/main) ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/joshuatz/glitch-static-build-cache) [![NPM Badge](https://img.shields.io/npm/v/glitch-static-build-cache)](https://www.npmjs.com/package/glitch-static-build-cache)
 > Easy to use CLI command to get Glitch to re-use past builds if nothing has changed, for projects that build a static site output.
 
 This is really just a wrapper around my other package, [static-build-cache](https://github.com/joshuatz/static-build-cache).
