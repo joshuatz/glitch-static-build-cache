@@ -26,10 +26,10 @@ test(`Tests import of main`, async (t) => {
 			servePort: TEST_PORT,
 		});
 	});
-	t.true(typeof runner.forceExit === 'function');
+	t.true(typeof runner.forceStop === 'function');
 
 	// Shutdown
 	await t.notThrowsAsync(async () => {
-		await runner.forceExit();
+		await runner.forceStop();
 	});
 });
