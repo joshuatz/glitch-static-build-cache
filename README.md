@@ -4,7 +4,7 @@
 
 This is really just a wrapper around my other package, [static-build-cache](https://github.com/joshuatz/static-build-cache).
 
-<!-- @TODO - add demo video / GIF? -->
+Even with just the basic create-react-app starter, using this tool can reduce startup startup drastically, from 70+ seconds to 27 seconds (see demo [video](./demo.mp4) or [GIF](./demo.gif)).
 
 ## Installation
 Install how you would normally install packages. If you are on Glitch, see [these instructions](https://cheatsheets.joshuatz.com/cheatsheets/cloud-services/glitch/#how-to-add-a-package).
